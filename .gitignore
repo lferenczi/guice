@@ -9,3 +9,6 @@
 /mybatis-guice_TEST.script
 /nb*
 /target
+out/
+build/
+.gradle/

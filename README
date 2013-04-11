@@ -1,1 +1,6 @@
-The MyBatis Guice module is easy-to-use Google Guice bridge for MyBatis sql mapping framework.
+Forked from mybatis-guice
+
+Module is enhanced with real multiple database support
+
+TODO Add doc
+
