@@ -138,6 +138,18 @@ public class DbBuilder {
         return this;
     }
 
+    /**
+     * Create a simple aliases which is the simple name of the class for a given type
+     *
+     * @param types List of types to create aliases for
+     * @return builder
+     */
+    public DbBuilder addSimpleAliases(Class<?>... types) {
+        for (Class<?> clazz : types) {
+            module.addAlias(clazz.getSimpleName(), clazz);
+        }
+        return this;
+    }
 
     /**
      * Add handler to a given type
@@ -146,8 +158,24 @@ public class DbBuilder {
      * @param handler Handler handling type
      * @return builder
      */
-    public <T> DbBuilder addHandler(Class<T> type, Class<? extends TypeHandler<?>> handler) {
+    @SuppressWarnings("unchecked")
+    public <T> DbBuilder addHandler(Class<? extends TypeHandler> handler, Class<T> type) {
         module.addHandler(type, handler);
+        return this;
+    }
+
+    /**
+     * Add multiple classes handled by the same handler
+     *
+     * @param handler Handler handing types
+     * @param types List of classes handled
+     * @return builder
+     */
+    @SuppressWarnings("unchecked")
+    public DbBuilder addHandlers(Class<? extends TypeHandler> handler, Class<?>... types) {
+        for (Class<?> clazz : types) {
+            module.addHandler(clazz, handler);
+        }
         return this;
     }
 }

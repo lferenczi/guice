@@ -15,6 +15,7 @@
  */
 package org.mybatis.guice.module;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
@@ -88,6 +89,8 @@ public class DbModule extends PrivateModule {
 
     @Override
     protected void configure() {
+        Preconditions.checkNotNull(annotatedWith, "Annotation must be specified for datasource: " + environmentId);
+
         aliases = newMapBinder(binder(), new TypeLiteral<String>(){}, new TypeLiteral<Class<?>>(){}, TypeAliases.class);
         handlers = newMapBinder(binder(), new TypeLiteral<Class<?>>(){}, new TypeLiteral<TypeHandler<?>>(){});
 //        interceptors = newSetBinder(binder(), Interceptor.class);
@@ -146,8 +149,9 @@ public class DbModule extends PrivateModule {
         aliasesMap.put(alias, type);
     }
 
-    public void addHandler(Class<?> type, Class<? extends TypeHandler<?>> handler) {
-        handlersMap.put(type, handler);
+    @SuppressWarnings("unchecked")
+    public <T> void addHandler(Class<T> type, Class<? extends TypeHandler> handler) {
+        handlersMap.put(type, (Class<? extends TypeHandler<?>>) handler);
     }
 
     public void withAnnotation(Annotation annotatedWith) {

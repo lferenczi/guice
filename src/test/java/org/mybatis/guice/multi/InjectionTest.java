@@ -40,13 +40,15 @@ public class InjectionTest {
                     .annotatedWith(Database.defaultDb())
                     .addMapper(TestMapper.class)
                     .addAlias("Hello", String.class)
+                    .addHandler(DummyTypeHandler.class, DummyType.class)
+                    .addHandlers(DummyTypeHandler.class, DummyType.class)
                     .dataSource(Providers.guicify(p));
 
             add("test")
                     .annotatedWith(Database.named("test"))
                     .addMapper(TestMapper.class)
                     .addMapperXml("org/mybatis/guice/multi/TestMapper.xml")
-                    .addHandler(String.class, StringTypeHandler.class)
+                    .addHandler(StringTypeHandler.class, String.class)
                     .dataSource(Providers.guicify(p2));
         }
     }
