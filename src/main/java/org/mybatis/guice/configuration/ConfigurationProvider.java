@@ -15,6 +15,7 @@
  */
 package org.mybatis.guice.configuration;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +25,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.executor.ErrorContext;
+import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
@@ -101,6 +104,10 @@ public final class ConfigurationProvider implements Provider<Configuration> {
     @com.google.inject.Inject(optional = true)
     @Mappers
     private Set<Class<?>> mapperClasses = Collections.emptySet();
+
+    @com.google.inject.Inject(optional = true)
+    @Mappers
+    private Set<String> mapperXmls = Collections.emptySet();
 
     @com.google.inject.Inject(optional = true)
     private Set<Interceptor> plugins = Collections.emptySet();
@@ -217,6 +224,15 @@ public final class ConfigurationProvider implements Provider<Configuration> {
     }
 
     /**
+     * Adds the user defined Mapper XML files to the myBatis Configuration.
+     *
+     * @param mapperXmls the user defined Mapper classes.
+     */
+    public void setMapperXmls(Set<String> mapperXmls) {
+        this.mapperXmls = mapperXmls;
+    }
+
+    /**
      * Adds the user defined ObjectFactory to the myBatis Configuration.
      *
      * @param objectFactory
@@ -277,6 +293,12 @@ public final class ConfigurationProvider implements Provider<Configuration> {
                 if (!configuration.hasMapper(mapperClass)) {
                     configuration.addMapper(mapperClass);
                 }
+            }
+
+            for (String mapperXml : mapperXmls) {
+                InputStream inputStream = Resources.getResourceAsStream(mapperXml);
+                XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, mapperXml, configuration.getSqlFragments());
+                mapperParser.parse();
             }
 
             for (Interceptor interceptor : plugins) {

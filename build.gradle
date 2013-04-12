@@ -3,8 +3,8 @@
  */
 apply plugin: "mediasat"
 
-project.group = "org.mybatis"
-project.version = "3.4-MULTI-SNAPSHOT"
+group = "org.mybatis"
+version = "3.4-SNAPSHOT"
 
 sourceCompatibility = 1.7
 archivesBaseName = "mybatis-multi-guice"

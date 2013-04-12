@@ -61,6 +61,7 @@ public class DbModule extends PrivateModule {
 //    private Multibinder<TypeHandler<?>> mappingTypeHandlers;
 //    private Multibinder<Interceptor> interceptors;
     private Multibinder<Class<?>> mappers;
+    private Multibinder<String> mapperXmls;
 
     // Configuration
     private String environmentId;
@@ -68,6 +69,7 @@ public class DbModule extends PrivateModule {
     private Provider<DataSource> dataSourceProvider;
 
     private Set<Class<?>> mappersSet;
+    private Set<String> mapperXmlSet;
     private Map<String, Class> aliasesMap;
     private Map<Class<?>, Class<? extends TypeHandler<?>>> handlersMap;
 
@@ -79,6 +81,7 @@ public class DbModule extends PrivateModule {
         this.environmentId = environmentId;
 
         this.mappersSet = new HashSet<>();
+        this.mapperXmlSet = new HashSet<>();
         this.aliasesMap = new HashMap<>();
         this.handlersMap = new HashMap<>();
     }
@@ -90,6 +93,7 @@ public class DbModule extends PrivateModule {
 //        interceptors = newSetBinder(binder(), Interceptor.class);
 //        mappingTypeHandlers = newSetBinder(binder(), new TypeLiteral<TypeHandler<?>>(){}, MappingTypeHandlers.class);
         mappers = newSetBinder(binder(), new TypeLiteral<Class<?>>(){}, Mappers.class);
+        mapperXmls = newSetBinder(binder(), String.class, Mappers.class);
 
         bindConstant().annotatedWith(Names.named("mybatis.environment.id")).to(environmentId);
 
@@ -120,6 +124,9 @@ public class DbModule extends PrivateModule {
             bindMapper(mapper);
             bindWithKey(mapper);
         }
+        for (String mapperXml : mapperXmlSet) {
+            mapperXmls.addBinding().toInstance(mapperXml);
+        }
 
         // Type handlers
         for (Map.Entry<Class<?>, Class<? extends TypeHandler<?>>> e : handlersMap.entrySet()) {
@@ -129,6 +136,10 @@ public class DbModule extends PrivateModule {
 
     public <T> void addMapper(Class<T> type) {
         mappersSet.add(type);
+    }
+
+    public void addMapperXml(String resource) {
+        mapperXmlSet.add(resource);
     }
 
     public <T> void addAlias(String alias, Class<T> type) {

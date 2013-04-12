@@ -90,6 +90,32 @@ public class DbBuilder {
     }
 
     /**
+     * Add a mapper xml mapping
+     * Method can be invoked more than once, all mappers will be configured
+     *
+     * @param resource Resource path of the XML mapper
+     * @return builder
+     */
+    public DbBuilder addMapperXml(String resource) {
+        this.module.addMapperXml(resource);
+        return this;
+    }
+
+    /**
+     * Add multiple mapper xml resources
+     * Method can be invoked more than once, all mappers will be configured
+     *
+     * @param resources Path of resources to add
+     * @return builder
+     */
+    public DbBuilder addMapperXmls(String... resources) {
+        for (String res : resources) {
+            this.module.addMapperXml(res);
+        }
+        return this;
+    }
+
+    /**
      * Create a MyBatis alias for a given type
      *
      * @param alias Alias for the type

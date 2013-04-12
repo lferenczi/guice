@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.util.Providers;
 import junit.framework.Assert;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.type.StringTypeHandler;
 import org.junit.Test;
 import org.mybatis.guice.MultiDbModule;
@@ -44,6 +45,7 @@ public class InjectionTest {
             add("test")
                     .annotatedWith(Database.named("test"))
                     .addMapper(TestMapper.class)
+                    .addMapperXml("org/mybatis/guice/multi/TestMapper.xml")
                     .addHandler(String.class, StringTypeHandler.class)
                     .dataSource(Providers.guicify(p2));
         }
@@ -60,6 +62,11 @@ public class InjectionTest {
         TestMapper t2 = i.getInstance(Key.get(TestMapper.class, Database.named("test")));
         int one2 = t2.selectOne();
         Assert.assertEquals(one2, 1);
+
+        SqlSession s = i.getInstance(Key.get(SqlSession.class, Database.named("test")));
+
+        int one3 = s.selectOne("test");
+        Assert.assertEquals(one3, 1);
     }
 
 }
