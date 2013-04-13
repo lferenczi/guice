@@ -39,6 +39,7 @@ import org.mybatis.guice.session.SqlSessionFactoryProvider;
 
 import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -133,7 +134,7 @@ public class DbModule extends PrivateModule {
 
         // Type handlers
         for (Map.Entry<Class<?>, Class<? extends TypeHandler<?>>> e : handlersMap.entrySet()) {
-            handlers.addBinding(e.getKey()).to(e.getValue());
+            handlers.addBinding(e.getKey()).toInstance(createTypeHandler(e.getKey(), e.getValue()));
         }
     }
 
@@ -188,6 +189,37 @@ public class DbModule extends PrivateModule {
         Key<T> key = Key.get(clazz, annotatedWith);
         bind(key).to(clazz);
         expose(key);
+    }
+
+    /**
+     * Constructs a TypeHandler instance. To support generic mappers without actual type information
+     * the {@code TypeHandlerFactory.getInstance()} method's logic is re-used. The created class will be bound
+     * by guice, allowing injection to happen correctly
+     *
+     * @param type Type to handle
+     * @param handler Handler type
+     * @return Constructed TypeHandler instance
+     */
+    private TypeHandler<?> createTypeHandler(Class<?> type, Class<? extends TypeHandler<?>> handler) {
+        if (type != null) {
+            try {
+                Constructor<?> c = handler.getConstructor(Class.class);
+                return (TypeHandler<?>) c.newInstance(type);
+            }
+            catch (NoSuchMethodException ignored) {
+                // ignored
+            }
+            catch (Exception e) {
+                throw new ProvisionException("Failed creating type handler for " + handler, e);
+            }
+        }
+        try {
+            Constructor<?> c = handler.getConstructor();
+            return (TypeHandler<?>) c.newInstance();
+        }
+        catch (Exception e) {
+            throw new ProvisionException("Failed creating type handler for " + handler, e);
+        }
     }
 
 }

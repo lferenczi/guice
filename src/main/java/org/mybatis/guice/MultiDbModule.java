@@ -22,6 +22,7 @@ import org.mybatis.guice.module.DbBuilder;
 import org.mybatis.guice.module.DbModule;
 import org.mybatis.guice.transactional.MultiTransactionManager;
 import org.mybatis.guice.transactional.MultiTransactionalMethodInterceptor;
+import org.mybatis.guice.transactional.TransactionManager;
 import org.mybatis.guice.transactional.Transactional;
 
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public abstract class MultiDbModule extends AbstractModule {
         bind(ClassLoader.class).annotatedWith(named("JDBC.driverClassLoader")).toInstance(driverClassLoader);
 
         bind(MultiTransactionManager.class).in(Scopes.SINGLETON);
+        bind(TransactionManager.class).in(Scopes.SINGLETON);
 
         MultiTransactionalMethodInterceptor interceptor = new MultiTransactionalMethodInterceptor();
         requestInjection(interceptor);
