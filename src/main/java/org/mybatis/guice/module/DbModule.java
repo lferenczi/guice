@@ -21,6 +21,7 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.session.Configuration;
@@ -31,6 +32,7 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.type.TypeHandler;
 import org.mybatis.guice.configuration.ConfigurationProvider;
 import org.mybatis.guice.configuration.Mappers;
+import org.mybatis.guice.configuration.MappingTypeHandlers;
 import org.mybatis.guice.configuration.TypeAliases;
 import org.mybatis.guice.environment.EnvironmentProvider;
 import org.mybatis.guice.mappers.MultiMapperProvider;
@@ -60,8 +62,8 @@ public class DbModule extends PrivateModule {
 
     private MapBinder<String, Class<?>> aliases;
     private MapBinder<Class<?>, TypeHandler<?>> handlers;
-//    private Multibinder<TypeHandler<?>> mappingTypeHandlers;
-//    private Multibinder<Interceptor> interceptors;
+    private Multibinder<TypeHandler<?>> mappingTypeHandlers;
+    private Multibinder<Interceptor> interceptors;
     private Multibinder<Class<?>> mappers;
     private Multibinder<String> mapperXmls;
 
@@ -94,8 +96,8 @@ public class DbModule extends PrivateModule {
 
         aliases = newMapBinder(binder(), new TypeLiteral<String>(){}, new TypeLiteral<Class<?>>(){}, TypeAliases.class);
         handlers = newMapBinder(binder(), new TypeLiteral<Class<?>>(){}, new TypeLiteral<TypeHandler<?>>(){});
-//        interceptors = newSetBinder(binder(), Interceptor.class);
-//        mappingTypeHandlers = newSetBinder(binder(), new TypeLiteral<TypeHandler<?>>(){}, MappingTypeHandlers.class);
+        interceptors = newSetBinder(binder(), Interceptor.class);
+        mappingTypeHandlers = newSetBinder(binder(), new TypeLiteral<TypeHandler<?>>(){}, MappingTypeHandlers.class);
         mappers = newSetBinder(binder(), new TypeLiteral<Class<?>>(){}, Mappers.class);
         mapperXmls = newSetBinder(binder(), String.class, Mappers.class);
 
