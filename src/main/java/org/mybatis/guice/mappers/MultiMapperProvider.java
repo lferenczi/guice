@@ -15,10 +15,9 @@
  */
 package org.mybatis.guice.mappers;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.mybatis.guice.session.DbSessionManager;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * A generic MyBatis mapper provider.
@@ -30,18 +29,14 @@ public final class MultiMapperProvider<T> implements Provider<T> {
     private final Class<T> mapperType;
 
     @Inject
-    private DbSessionManager sessionManager;
+    private Provider<DbSessionManager> sessionManager;
 
     public MultiMapperProvider(Class<T> mapperType) {
         this.mapperType = mapperType;
     }
 
-    public void setSessionManager(DbSessionManager sessionManager) {
-        this.sessionManager = sessionManager;
-    }
-
     public T get() {
-        return this.sessionManager.getMapper(mapperType);
+        return sessionManager.get().getMapper(mapperType);
     }
 
 }

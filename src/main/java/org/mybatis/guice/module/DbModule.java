@@ -116,10 +116,6 @@ public class DbModule extends PrivateModule {
 
         bind(ObjectFactory.class).to(objectFactoryType).in(Scopes.SINGLETON);
 
-        bindWithKey(SqlSession.class);
-        bindWithKey(SqlSessionFactory.class);
-        bindWithKey(DbSessionManager.class);
-
         // Aliases
         for (Map.Entry<String, Class> e : aliasesMap.entrySet()) {
             aliases.addBinding(e.getKey()).toInstance(e.getValue());
@@ -138,6 +134,10 @@ public class DbModule extends PrivateModule {
         for (Map.Entry<Class<?>, Class<? extends TypeHandler<?>>> e : handlersMap.entrySet()) {
             handlers.addBinding(e.getKey()).toInstance(createTypeHandler(e.getKey(), e.getValue()));
         }
+
+        bindWithKey(SqlSession.class);
+        bindWithKey(SqlSessionFactory.class);
+        bindWithKey(DbSessionManager.class);
     }
 
     public <T> void addMapper(Class<T> type) {
@@ -178,8 +178,8 @@ public class DbModule extends PrivateModule {
      * @param <T>
      */
     private <T> void bindMapper(Class<T> mapperType) {
+        bind(mapperType).toProvider(new MultiMapperProvider<>(mapperType)).in(Scopes.SINGLETON);
         mappers.addBinding().toInstance(mapperType);
-        bind(mapperType).toProvider(guicify(new MultiMapperProvider<>(mapperType))).in(Scopes.SINGLETON);
     }
 
     /**
