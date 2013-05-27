@@ -122,6 +122,10 @@ public class MultiTransactionManager {
                 }
             }
         }
+
+        // Ensure thread local cleanup on finishing
+        stopTransactionalContext();
+
         if (errors) {
             throw new PersistenceException("One or more environments failed to close. See log for details");
         }
