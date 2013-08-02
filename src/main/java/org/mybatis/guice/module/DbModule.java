@@ -92,8 +92,6 @@ public class DbModule extends PrivateModule {
 
     @Override
     protected void configure() {
-        Preconditions.checkNotNull(annotatedWith, "Annotation must be specified for datasource: " + environmentId);
-
         aliases = newMapBinder(binder(), new TypeLiteral<String>(){}, new TypeLiteral<Class<?>>(){}, TypeAliases.class);
         handlers = newMapBinder(binder(), new TypeLiteral<Class<?>>(){}, new TypeLiteral<TypeHandler<?>>(){});
         interceptors = newSetBinder(binder(), Interceptor.class);
@@ -188,9 +186,14 @@ public class DbModule extends PrivateModule {
      * @param clazz type for the key
      */
     private <T> void bindWithKey(Class<T> clazz) {
-        Key<T> key = Key.get(clazz, annotatedWith);
-        bind(key).to(clazz);
-        expose(key);
+        if (annotatedWith != null) {
+            Key<T> key = Key.get(clazz, annotatedWith);
+            bind(key).to(clazz);
+            expose(key);
+        }
+        else {
+            expose(clazz);
+        }
     }
 
     /**
